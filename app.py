@@ -4,6 +4,7 @@ import joblib
 import re
 import html
 import nltk
+from pathlib import Path
 
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -219,11 +220,34 @@ stop_words, lemmatizer = load_nltk_resources()
 # 4. LOAD TRAINED MODEL
 # ==========================================
 
+# Get the directory containing app.py
+BASE_DIR = Path(__file__).resolve().parent
+
+# Model and vectorizer paths
+MODEL_PATH = BASE_DIR / "(TF-IDF & ML)_model.pkl"
+VECTORIZER_PATH = BASE_DIR / "tfidf_vectorizer.pkl"
+
+
 @st.cache_resource
 def load_models():
 
-    model = joblib.load('final_model.pkl')
-    tfidf = joblib.load('tfidf_vectorizer.pkl')
+    # Check whether both files exist
+    missing_files = [
+        path.name
+        for path in (MODEL_PATH, VECTORIZER_PATH)
+        if not path.is_file()
+    ]
+
+    if missing_files:
+        raise FileNotFoundError(
+            "Required file(s) not found: "
+            + ", ".join(missing_files)
+            + ". Please check your GitHub repository."
+        )
+
+    # Load trained model and vectorizer
+    model = joblib.load(MODEL_PATH)
+    tfidf = joblib.load(VECTORIZER_PATH)
 
     return model, tfidf
 
@@ -346,12 +370,12 @@ with st.sidebar:
     st.markdown("### 📈 Model Performance")
 
     st.metric(
-        label="Test f1",
+        label="Test F1",
         value="89.83%"
     )
 
     st.caption(
-        "Previously measured test f1. "
+        "Previously measured test F1. "
         "This is not a live prediction confidence."
     )
 
