@@ -346,12 +346,12 @@ with st.sidebar:
     st.markdown("### 📈 Model Performance")
 
     st.metric(
-        label="Test Accuracy",
+        label="Test f1",
         value="89.83%"
     )
 
     st.caption(
-        "Previously measured test accuracy. "
+        "Previously measured test f1. "
         "This is not a live prediction confidence."
     )
 
