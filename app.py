@@ -216,14 +216,18 @@ def load_nltk_resources():
 stop_words, lemmatizer = load_nltk_resources()
 
 
+
 # ==========================================
 # 4. LOAD TRAINED MODEL
 # ==========================================
 
-# Get the directory containing app.py
+import os
+from pathlib import Path
+
+# Get the current app directory
 BASE_DIR = Path(__file__).resolve().parent
 
-# Model and vectorizer paths
+# Correct model file paths
 MODEL_PATH = BASE_DIR / "(TF-IDF & ML)_model.pkl"
 VECTORIZER_PATH = BASE_DIR / "tfidf_vectorizer.pkl"
 
@@ -231,28 +235,36 @@ VECTORIZER_PATH = BASE_DIR / "tfidf_vectorizer.pkl"
 @st.cache_resource
 def load_models():
 
-    # Check whether both files exist
-    missing_files = [
-        path.name
-        for path in (MODEL_PATH, VECTORIZER_PATH)
-        if not path.is_file()
-    ]
+    # Display and verify the application directory
+    st.write("Application directory:", str(BASE_DIR))
 
-    if missing_files:
+    # Check model file
+    if not MODEL_PATH.is_file():
+        st.error(f"Model file not found: {MODEL_PATH.name}")
+        st.write("Available files:", os.listdir(BASE_DIR))
         raise FileNotFoundError(
-            "Required file(s) not found: "
-            + ", ".join(missing_files)
-            + ". Please check your GitHub repository."
+            f"Missing model file: {MODEL_PATH.name}"
         )
 
-    # Load trained model and vectorizer
+    # Check vectorizer file
+    if not VECTORIZER_PATH.is_file():
+        st.error(f"Vectorizer file not found: {VECTORIZER_PATH.name}")
+        st.write("Available files:", os.listdir(BASE_DIR))
+        raise FileNotFoundError(
+            f"Missing vectorizer file: {VECTORIZER_PATH.name}"
+        )
+
+    # Load model and vectorizer
     model = joblib.load(MODEL_PATH)
     tfidf = joblib.load(VECTORIZER_PATH)
 
     return model, tfidf
 
 
+# Load trained files
 model, tfidf = load_models()
+
+st.success("Model and TF-IDF Vectorizer loaded successfully!")
 
 
 # ==========================================
